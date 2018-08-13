@@ -17,7 +17,8 @@ Các exporter xem thêm tại : https://prometheus.io/docs/instrumenting/exporte
 Chi tiết cách cài đặt của một số Exporter sẽ được cập nhật tại đây: 
 
 - [1. Node Exporter](#node)
-- [2. Blackbox Exporter](#blackbox)]
+- [2. Blackbox Exporter](#blackbox)
+- [3. Mysqld exporter](#mysql)
 
 
 <a name="node"></a>
@@ -232,6 +233,105 @@ Prometheus config file - /etc/prometheus/prometheus.yml
         target_label: instance
       - target_label: __address__
         replacement: localhost:9115
+```
+
+```
+sudo systemctl restart prometheus
+sudo systemctl status prometheus
+```
+
+
+
+<a name="mysql"></a>
+### 3. Mysqld exporter
+
+
+#### Trên máy cần monitor: 
+
+Tạo user `mysql_exporter`:
+
+```
+sudo adduser --no-create-home --disabled-login --shell /bin/false --gecos "MySQL exporter user" mysql_exporter
+```
+
+Tải bản mới nhất từ [trang chủ](https://prometheus.io/download/): 
+
+```
+cd ~
+wget https://github.com/prometheus/mysqld_exporter/releases/download/v0.11.0/mysqld_exporter-0.11.0.linux-amd64.tar.gz
+
+tar xvf mysqld_exporter-0.11.0.linux-amd64.tar.gz
+
+sudo mv ./mysqld_exporter-0.11.0.linux-amd64/mysqld_exporter /usr/local/bin/
+sudo chown mysql_exporter:mysql_exporter /usr/local/bin/mysqld_exporter
+
+rm -rf ~/mysqld_exporter-0.11.0.linux-amd64.tar.gz ~/mysqld_exporter-0.11.0.linux-amd64
+```
+
+Config mysqld exporter
+```
+sudo mkdir /etc/mysql_exporter
+sudo touch /etc/mysql_exporter/.my.cnf
+
+sudo chown -R mysql_exporter:mysql_exporter /etc/mysql_exporter
+sudo chmod 600 /etc/mysql_exporter/.my.cnf
+sudo vi /etc/mysql_exporter/.my.cnf
+```
+
+File `/etc/mysql_exporter/.my.cnf`
+
+```
+[client]
+user=REPLACE_WITH_YOUR_USER
+password=REPLACE_WITH_YOUR_PASSWORD
+```
+
+Running mysqld exporter
+
+```
+sudo vi /etc/systemd/system/mysql_exporter.service
+```
+
+Mysqld Exporter service file - `/etc/systemd/system/mysql_exporter.service`
+```
+[Unit]
+Description=Prometheus MySQL Exporter
+After=network.target
+
+[Service]
+User=mysql_exporter
+Group=mysql_exporter
+Type=simple
+ExecStart=/usr/local/bin/mysqld_exporter \
+    --config.my-cnf="/etc/mysql_exporter/.my.cnf"
+Restart=always
+
+[Install]
+WantedBy=multi-user.target
+```
+
+```
+sudo systemctl daemon-reload
+sudo systemctl enable mysql_exporter
+sudo systemctl start mysql_exporter
+```
+
+#### Trên máy Prometheus server:  
+
+Cấu hình Prometheus server để scrape Node Exporter 
+
+```
+sudo vi /etc/prometheus/prometheus.yml
+```
+
+Prometheus config file - /etc/prometheus/prometheus.yml
+```
+...
+  - job_name: 'mysql_exporter'
+    scrape_interval: 5s
+    static_configs:
+      - targets:
+        - localhost:9104
 ```
 
 ```
