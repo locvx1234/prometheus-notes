@@ -210,7 +210,7 @@ sudo systemctl enable blackbox_exporter
 
 #### Trên máy Prometheus server:  
 
-Cấu hình Prometheus server để scrape Node Exporter 
+Cấu hình Prometheus server để scrape Blackbox Exporter 
 
 ```
 sudo vi /etc/prometheus/prometheus.yml
