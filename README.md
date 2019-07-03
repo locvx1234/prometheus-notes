@@ -14,3 +14,5 @@ Ghi chép về Prometheus
 [6. Client lib](#)
 
 [7. Visualize](https://github.com/locvx1234/prometheus-notes/blob/master/docs/Visualize.md)
+
+[8. Monitor K8S outside cluster](https://github.com/locvx1234/prometheus-notes/blob/master/docs/K8s_outside.md)
