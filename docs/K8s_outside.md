@@ -94,6 +94,8 @@ Sau khi điền xong, chọn `Save` để hoàn tất
 ![dashboard](https://raw.githubusercontent.com/locvx1234/prometheus-notes/master/images/dashboard-k8s.png)
 
 
+### Ref
 
+https://medium.com/thg-tech-blog/monitoring-multiple-kubernetes-clusters-88cf34442fa3
 
-
+https://medium.com/@nieldw/curling-the-kubernetes-api-server-d7675cfc398c
